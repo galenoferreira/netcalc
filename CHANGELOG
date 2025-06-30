@@ -1,0 +1,10 @@
+
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+## [1.0.0] - 2025-06-30
+- Initial release: core features with interactive menu, subnet calculations, metrics endpoint, and multi-platform builds.
