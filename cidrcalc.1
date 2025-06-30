@@ -1,0 +1,23 @@
+.TH CIDRCALC 1 "June 2025" "CIDRCalc 1.0" "User Commands"
+.SH NAME
+cidrcalc \- IPv4 subnet calculator CLI tool
+.SH SYNOPSIS
+.B cidrcalc
+    [\fIip\fC/\fIcidr\fR] \\
+    cidrcalc \fIip\fR \fImask\fR
+.SH DESCRIPTION
+IPv4 subnet calculations: netmask, network, broadcast, hosts.
+Execute interactively if no arguments are supplied.
+.SH OPTIONS
+.TP
+\fB-h\fR, \fB--help\fR
+Show help message.
+.SH EXAMPLES
+.nf
+  cidrcalc 192.168.0.1/24
+  cidrcalc 10.0.0.5 255.255.255.0
+.fi
+.SH AUTHOR
+Written by Galeno Ferreira.
+.SH REPORTING BUGS
+https://github.com/galenoferreira/cidrcalc/issues
