@@ -21,5 +21,6 @@ GOOS=darwin GOARCH=amd64 go build -o bin/mac_intel/netcalc netcalc.go
 
 echo "🔨 Building netcalc for macOS Apple Silicon (arm64)..."
 GOOS=darwin GOARCH=arm64 go build -o bin/mac_apple_silicon/netcalc netcalc.go
+cp /Users/galeno/GitHub_Projects/netcalc/bin/mac_apple_silicon/netcalc /usr/local/bin/
 
 echo "✅ All builds completed successfully!"

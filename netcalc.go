@@ -121,14 +121,14 @@ func NetCalc(ipStr string, bits uint) {
 	}
 
 	// Detailed, emoji-rich output
-	fmt.Println("🔍 Input IP:            ", ipStr)
-	fmt.Printf("🔢 Netmask:            %s (/ %d)\n", Uint32ToIP(maskUint), bits)
-	fmt.Printf("🛡️ Mask (hex):          0x%X\n", maskUint)
-	fmt.Printf("✖ Wildcard Mask:       %s\n", Uint32ToIP(wildcard))
-	fmt.Printf("🌐 Network Address:     %s/%d\n", Uint32ToIP(network), bits)
-	fmt.Printf("📡 Broadcast Address:   %s\n", Uint32ToIP(broadcast))
-	fmt.Printf("↕️  Usable Host Range:  %s - %s\n", Uint32ToIP(firstIP), Uint32ToIP(lastIP))
-	fmt.Printf("📊 Total Usable Hosts:  %d\n", totalHosts)
+	fmt.Printf("%-25s %s\n", "🔍 Input IP:", ipStr)
+	fmt.Printf("%-25s %s (/ %d)\n", "🔢 Netmask:", Uint32ToIP(maskUint), bits)
+	fmt.Printf("%-25s 0x%X\n", "🛡️ Mask (hex):", maskUint)
+	fmt.Printf("%-25s %s\n", "✖ Wildcard Mask:", Uint32ToIP(wildcard))
+	fmt.Printf("%-25s %s/%d\n", "🌐 Network Address:", Uint32ToIP(network), bits)
+	fmt.Printf("%-25s %s\n", "📡 Broadcast Address:", Uint32ToIP(broadcast))
+	fmt.Printf("%-25s %s - %s\n", "↕️ Usable Host Range:", Uint32ToIP(firstIP), Uint32ToIP(lastIP))
+	fmt.Printf("%-25s %d\n", "📊 Total Usable Hosts:", totalHosts)
 }
 
 // Netmask returns a 32-bit network mask for the given prefix length.
