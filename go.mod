@@ -1,3 +1,3 @@
-module github.com/galenoferreira/cidrcalc
+module github.com/galenoferreira/netcalc
 
 go 1.24.4
