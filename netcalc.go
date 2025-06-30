@@ -1,5 +1,5 @@
 /*
- * netcalc - IPv4 Subnet Calculator
+ * netcalc - IPv4 Subnet Calculator.
  *
  * Version Control:
  *   Build Time : ${BUILD_TIME}
@@ -25,11 +25,9 @@ import (
 	"strings"
 )
 
-var (
-	buildTime string // build timestamp
-	gitCommit string // git commit hash
-	gitBranch string // git branch name
-)
+var buildTime string // build timestamp
+var gitCommit string // git commit hash
+var gitBranch string // git branch name
 
 var ErrHelp = errors.New("help requested")
 
