@@ -1,3 +1,28 @@
+# Arquivos de Segurança
 *.pem
-cidrcalc
+*.key
+*.crt
+
+# Arquivos de Log
 *.log
+*.log.*
+logs/
+
+# Arquivos de Build e Binários
+cidrcalc
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente Virtual
+venv/
+.env
+.venv
+ENV/
+
+# IDEs e Editores
+.idea/
+.vscode/
+*.swp
+*.swo
