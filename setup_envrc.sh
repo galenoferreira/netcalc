@@ -67,7 +67,7 @@ case "$1" in
 # Carrega o script de configuração do Conda
 source "$(conda info --base)/etc/profile.d/conda.sh"
 # Ativa o ambiente
-conda activate $yt2mp3
+conda activate $cidrcalc
 # Adiciona o diretório atual ao PATH
 REP_DIR=$(pwd)
 export REP_DIR
