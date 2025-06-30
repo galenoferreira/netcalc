@@ -1,5 +1,5 @@
 /*
- * netcalc - IPv4 Subnet Calculator..
+ * netcalc - IPv4 Subnet Calculator....
  *
  * Version Control:
  *   Build Time : ${BUILD_TIME}
