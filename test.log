@@ -1,0 +1,104 @@
+[Go/build] ⭐ Run Set up job
+[Go/build] 🚀  Start image=catthehacker/ubuntu:act-latest
+[Go/build]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=true
+[Go/build] using DockerAuthConfig authentication for docker pull
+[Go/build]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[Go/build]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[Go/build]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[Go/build]   ✅  Success - Set up job
+[Go/build]   ☁  git clone 'https://github.com/actions/setup-go' # ref=v4
+[Go/build] ⭐ Run Main actions/checkout@v4
+[Go/build]   🐳  docker cp src=/Users/galeno/GitHub_Projects/lixo/netcalc/. dst=/Users/galeno/GitHub_Projects/lixo/netcalc
+[Go/build]   ✅  Success - Main actions/checkout@v4 [330.820667ms]
+[Go/build] ⭐ Run Main Set up Go
+[Go/build]   🐳  docker cp src=/Users/galeno/.cache/act/actions-setup-go@v4/ dst=/var/run/act/actions/actions-setup-go@v4/
+[Go/build]   🐳  docker exec cmd=[/opt/acttoolcache/node/18.20.8/arm64/bin/node /var/run/act/actions/actions-setup-go@v4/dist/setup/index.js] user= workdir=
+[Go/build]   | Setup go version spec 1.20
+[Go/build]   | Found in cache @ /opt/hostedtoolcache/go/1.20.14/arm64
+[Go/build]   | Added go to the path
+[Go/build]   | Successfully set up Go version 1.20
+[Go/build]   | [command]/opt/hostedtoolcache/go/1.20.14/arm64/bin/go env GOMODCACHE
+[Go/build]   | [command]/opt/hostedtoolcache/go/1.20.14/arm64/bin/go env GOCACHE
+[Go/build]   | /root/go/pkg/mod
+[Go/build]   | /root/.cache/go-build
+[Go/build]   ⚙  ***
+[Go/build]   | Cache Size: ~10 MB (10497559 B)
+[Go/build]   | [command]/usr/bin/tar -xf /tmp/755c6758-28b4-4345-88e5-021a68953e99/cache.tzst -P -C /Users/galeno/GitHub_Projects/lixo/netcalc --use-compress-program unzstd
+[Go/build]   | Cache restored successfully
+[Go/build]   | Cache restored from key: setup-go-linux-ubuntu20-go-1.20.14-5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456
+[Go/build]   ❓ add-matcher /run/act/actions/actions-setup-go@v4/matchers.json
+[Go/build]   | go version go1.20.14 linux/arm64
+[Go/build]   | 
+[Go/build]   ❓  ::group::go env
+[Go/build]   | GO111MODULE=""
+[Go/build]   | GOARCH="arm64"
+[Go/build]   | GOBIN=""
+[Go/build]   | GOCACHE="/root/.cache/go-build"
+[Go/build]   | GOENV="/root/.config/go/env"
+[Go/build]   | GOEXE=""
+[Go/build]   | GOEXPERIMENT=""
+[Go/build]   | GOFLAGS=""
+[Go/build]   | GOHOSTARCH="arm64"
+[Go/build]   | GOHOSTOS="linux"
+[Go/build]   | GOINSECURE=""
+[Go/build]   | GOMODCACHE="/root/go/pkg/mod"
+[Go/build]   | GONOPROXY=""
+[Go/build]   | GONOSUMDB=""
+[Go/build]   | GOOS="linux"
+[Go/build]   | GOPATH="/root/go"
+[Go/build]   | GOPRIVATE=""
+[Go/build]   | GOPROXY="https://proxy.golang.org,direct"
+[Go/build]   | GOROOT="/opt/hostedtoolcache/go/1.20.14/arm64"
+[Go/build]   | GOSUMDB="sum.golang.org"
+[Go/build]   | GOTMPDIR=""
+[Go/build]   | GOTOOLDIR="/opt/hostedtoolcache/go/1.20.14/arm64/pkg/tool/linux_arm64"
+[Go/build]   | GOVCS=""
+[Go/build]   | GOVERSION="go1.20.14"
+[Go/build]   | GCCGO="gccgo"
+[Go/build]   | AR="ar"
+[Go/build]   | CC="gcc"
+[Go/build]   | CXX="g++"
+[Go/build]   | CGO_ENABLED="1"
+[Go/build]   | GOMOD="/Users/galeno/GitHub_Projects/lixo/netcalc/go.mod"
+[Go/build]   | GOWORK=""
+[Go/build]   | CGO_CFLAGS="-O2 -g"
+[Go/build]   | CGO_CPPFLAGS=""
+[Go/build]   | CGO_CXXFLAGS="-O2 -g"
+[Go/build]   | CGO_FFLAGS="-O2 -g"
+[Go/build]   | CGO_LDFLAGS="-O2 -g"
+[Go/build]   | PKG_CONFIG="pkg-config"
+[Go/build]   | GOGCCFLAGS="-fPIC -pthread -Wl,--no-gc-sections -fmessage-length=0 -fdebug-prefix-map=/tmp/go-build1734703687=/tmp/go-build -gno-record-gcc-switches"
+[Go/build]   | 
+[Go/build]   ❓  ::endgroup::
+[Go/build]   ✅  Success - Main Set up Go [779.431833ms]
+[Go/build]   ⚙  ::set-output:: cache-hit=true
+[Go/build]   ⚙  ::set-output:: go-version=1.20.14
+[Go/build]   ⚙  ::add-path:: /opt/hostedtoolcache/go/1.20.14/arm64/bin
+[Go/build]   ⚙  ::add-path:: /root/go/bin
+[Go/build] ⭐ Run Main Build
+[Go/build]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/2] user= workdir=
+[Go/build]   ✅  Success - Main Build [229.803834ms]
+[Go/build] ⭐ Run Main Test
+[Go/build]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=
+[Go/build]   | === RUN   TestNetmask
+[Go/build]   | --- PASS: TestNetmask (0.00s)
+[Go/build]   | PASS
+[Go/build]   | ok  	github.com/galenoferreira/netcalc	(cached)
+[Go/build]   ✅  Success - Main Test [137.914542ms]
+[Go/build] ⭐ Run Post Set up Go
+[Go/build]   🐳  docker exec cmd=[/opt/acttoolcache/node/18.20.8/arm64/bin/node /var/run/act/actions/actions-setup-go@v4/dist/cache-save/index.js] user= workdir=
+[Go/build]   | [command]/opt/hostedtoolcache/go/1.20.14/arm64/bin/go env GOMODCACHE
+[Go/build]   | [command]/opt/hostedtoolcache/go/1.20.14/arm64/bin/go env GOCACHE
+[Go/build]   | /root/go/pkg/mod
+[Go/build]   | /root/.cache/go-build
+[Go/build]   | [warning]Cache folder path is retrieved but doesn't exist on disk: /root/go/pkg/mod
+[Go/build]   | [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/galeno/GitHub_Projects/lixo/netcalc --files-from manifest.txt --use-compress-program zstdmt
+[Go/build]   | Cache Size: ~10 MB (10491843 B)
+[Go/build]   | Cache saved successfully
+[Go/build]   | Cache saved with the key: setup-go-Linux-ubuntu20-go-1.20.14-5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456
+[Go/build]   ✅  Success - Post Set up Go [389.81875ms]
+[Go/build] ⭐ Run Complete job
+[Go/build] Cleaning up container for job build
+[Go/build]   ✅  Success - Complete job
+[Go/build] 🏁  Job succeeded
+
