@@ -29,8 +29,6 @@ echo "$NEW_TAG" >> .giti_tag
 # Prepare prefix for commit message
 PREFIX="[$NEW_TAG]"
 
-# Clean cached files (optional)
-git rm -r --cached .
 
 # Show diff
 echo
@@ -51,13 +49,18 @@ git add .
 gh release create "$NEW_TAG" \
   --title "$COMMIT_MSG"
 
+# Upload each binary file in the bin subdirectories
+for artifact in bin/*/*; do
+  [ -f "$artifact" ] && gh release upload "$NEW_TAG" "$artifact" --clobber
+done
+
 # Ensure we are on the master branch
 git checkout master
 
 # Create and push the new tag on master branch;
 git tag "$NEW_TAG" master
 git commit -m "$COMMIT_MSG"
-git push origin "$NEW_TAG"
+# git push origin --tags
 git push origin master
 
 # Return to original directory
