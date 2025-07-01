@@ -1,6 +1,6 @@
 // Package main implements netcalc, a CLI IPv4 subnet calculator with
 // support for interactive menus, single-command invocation, and detailed output.
-/*
+/*...
  * netcalc - IPv4 Subnet Calculator
  *
  * Version Control:
