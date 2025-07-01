@@ -20,9 +20,9 @@ package main
 import (
 	"encoding/binary"
 	"errors"
+	"flag"
 	"fmt"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -96,7 +96,7 @@ func parseInput(args []string) (string, uint, error) {
 //   - Wildcard mask and private-range overflow warnings
 //
 // The output is formatted with emojis and aligned columns.
-func NetCalc(ipStr string, bits uint) {
+func NetCalc(ipStr string, bits uint, showBin, showHex bool) {
 	// Convert values
 	maskUint := Netmask(bits)
 	ipUint := IPToUint32(ipStr)
@@ -132,15 +132,49 @@ func NetCalc(ipStr string, bits uint) {
 		}
 	}
 
-	// Detailed, emoji-rich output
-	fmt.Printf("%-25s %s\n", "🔍 Input IP:", ipStr)
-	fmt.Printf("%-25s %s (/ %d)\n", "🔢 Netmask:", Uint32ToIP(maskUint), bits)
-	fmt.Printf("%-25s 0x%X\n", "🛡️ Mask (hex):", maskUint)
-	fmt.Printf("%-25s %s\n", "✖ Wildcard Mask:", Uint32ToIP(wildcard))
-	fmt.Printf("%-25s %s/%d\n", "🌐 Network Address:", Uint32ToIP(network), bits)
-	fmt.Printf("%-25s %s\n", "📡 Broadcast Address:", Uint32ToIP(broadcast))
-	fmt.Printf("%-25s %s - %s\n", "↕️ Usable Host Range:", Uint32ToIP(firstIP), Uint32ToIP(lastIP))
-	fmt.Printf("%-25s %d\n", "📊 Total Usable Hosts:", totalHosts)
+	// ANSI color codes
+	const (
+		colorReset  = "\033[0m"
+		colorYellow = "\033[33m"
+		colorCyan   = "\033[36m"
+		colorGreen  = "\033[32m"
+	)
+
+	// Input section
+	fmt.Printf("%s❯ netcalc %s/%d%s\n\n", colorYellow, ipStr, bits, colorReset)
+	fmt.Println("---[ 🔍 INPUT ]----------------------------------")
+	fmt.Printf("Address               : %s%s/%d%s\n\n", colorYellow, ipStr, bits, colorReset)
+
+	// Network section
+	fmt.Println("---[ 🌐 NETWORK ]----------------------------------")
+	fmt.Printf("Network               : %s%s%s\n", colorCyan, Uint32ToIP(network), colorReset)
+	fmt.Printf("Broadcast             : %s%s%s\n", colorCyan, Uint32ToIP(broadcast), colorReset)
+	fmt.Printf("Usable Hosts          : %s%s - %s%s\n", colorCyan, Uint32ToIP(firstIP), Uint32ToIP(lastIP), colorReset)
+	fmt.Printf("Total Hosts           : %s%d%s\n\n", colorGreen, totalHosts, colorReset)
+
+	// Mask section
+	fmt.Println("---[ 🔢 MASK ]--------------------------------------")
+	fmt.Printf("Network Mask          : %s%s%s\n", colorYellow, Uint32ToIP(maskUint), colorReset)
+	fmt.Printf("Wildcard Mask         : %s%s%s\n", colorYellow, Uint32ToIP(wildcard), colorReset)
+	fmt.Printf("Hexadecimal Mask      : %s0x%X%s\n", colorYellow, maskUint, colorReset)
+
+	// Optional binary display
+	if showBin {
+		fmt.Println("\n---[ 🔢 BINARY ]---------------------------------")
+		fmt.Printf("IP (binary)           : %032b\n", ipUint)
+		fmt.Printf("Netmask (binary)      : %032b\n", maskUint)
+		fmt.Printf("Network (binary)      : %032b\n", network)
+		fmt.Printf("Broadcast (binary)    : %032b\n", broadcast)
+	}
+
+	// Optional hexadecimal display
+	if showHex {
+		fmt.Println("\n---[ 🔢 HEXADECIMAL ]-------------------------------")
+		fmt.Printf("IP (hex)              : 0x%X\n", ipUint)
+		fmt.Printf("Netmask (hex)         : 0x%X\n", maskUint)
+		fmt.Printf("Network (hex)         : 0x%X\n", network)
+		fmt.Printf("Broadcast (hex)       : 0x%X\n", broadcast)
+	}
 }
 
 // Netmask returns a 32-bit network mask for a given CIDR prefix length.
@@ -191,17 +225,25 @@ func printManual() {
 //   - Parsing input arguments
 //   - Invoking NetCalc for subnet calculation
 func main() {
+	// Define CLI flags
+	showBin := flag.Bool("b", false, "Show addresses in binary")
+	showHex := flag.Bool("h", false, "Show addresses in hexadecimal")
+	flag.Parse()
+
+	// Remaining args after flags
+	args := flag.Args()
+
 	// If the user provided no args or asked for help, show the manual.
-	if len(os.Args) == 1 || os.Args[1] == "-h" || os.Args[1] == "--help" {
+	if len(args) == 0 || (len(args) > 0 && args[0] == "--help") {
 		printManual()
 		return
 	}
 
 	// Otherwise, attempt to parse as CIDR or IP/mask.
-	ip, prefix, err := parseInput(os.Args[1:])
+	ip, prefix, err := parseInput(args)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
-	NetCalc(ip, prefix)
+	NetCalc(ip, prefix, *showBin, *showHex)
 }
