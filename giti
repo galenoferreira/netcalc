@@ -1,17 +1,57 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
+# Remember current directory
 CUR_DIR=$(pwd)
-cd "$REP_DIR" || exit 1
+# Change to repository directory (ensure REP_DIR is set or use current)
+cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
+# Determine last version tag
+if [[ -f .giti_tag ]]; then
+  LAST_TAG=$(<.giti_tag)
+else
+  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+fi
+
+# Strip leading 'v' and split into components
+VER=${LAST_TAG#v}
+IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
+
+# Increment patch version
+PATCH=$((PATCH + 1))
+NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+
+# Record new tag into .giti_tag
+echo "$NEW_TAG" > .giti_tag
+
+# Prepare prefix for commit message
+PREFIX="[$NEW_TAG]"
+
+# Clean cached files (optional)
 git rm -r --cached .
 
-echo ""
+# Show diff
+echo
 git diff
 
-read -p "Commit Message: " input
+# Read commit message from user
+read -p "Commit Message: " MSG
 
+# Prefix the commit message
+COMMIT_MSG="$PREFIX $MSG"
+
+# Stage all changes
 git add .
-git commit -m "$input"
+
+# Commit with prefixed message
+git commit -m "$COMMIT_MSG"
+
+# Push commit
 git push
 
+# Create and push the new tag
+git tag "$NEW_TAG"
+git push origin "$NEW_TAG"
+
+# Return to original directory
 cd "$CUR_DIR" || exit 1
