@@ -1,4 +1,5 @@
 # CI / CD Pipeline for netcalc
+
 name: CI / CD Pipeline
 
 # Trigger on pushes to main or master, version tags, or manual dispatch
@@ -24,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.20'
 
@@ -40,10 +41,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5.5.0
         with:
           go-version: '1.20'
 
@@ -51,7 +52,7 @@ jobs:
         run: go mod tidy
 
       - name: Cache Go modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4.2.3
         with:
           path: |
             ~/.cache/go-build
@@ -77,10 +78,10 @@ jobs:
         arch: [amd64, arm64]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.20'
 
@@ -88,7 +89,7 @@ jobs:
         run: go mod tidy
 
       - name: Cache Go modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4.2.3
         with:
           path: |
             ~/.cache/go-build
@@ -132,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
       - name: Create release
         id: create_release
