@@ -6,7 +6,7 @@
 
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
-## 🚀 Features
+## 🚀 Features.
 
 - **Subnet Calculations**: network, broadcast, usable host range, total hosts.
 - **Mask Utilities**: network mask, wildcard mask, hexadecimal mask.
