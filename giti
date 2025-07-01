@@ -57,7 +57,7 @@ git checkout master
 # Create and push the new tag on master branch;
 git tag "$NEW_TAG" master
 git commit -m "$COMMIT_MSG"
-# git push origin "$NEW_TAG"
+git push origin "$NEW_TAG"
 git push origin master
 
 # Return to original directory
