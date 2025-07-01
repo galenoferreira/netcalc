@@ -6,31 +6,25 @@ CUR_DIR=$(pwd)
 # Change to repository directory (ensure REP_DIR is set or use current)
 cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
-# Fetch all tags from origin to ensure we see the latest version
+# Fetch all tags from origin to ensure we have the latest versions
 git fetch --tags origin
 
-# Determine the last version tag from remote, defaulting to v0.0.0 if none
-LAST_TAG=$(git describe --tags --abbrev=0 origin/master 2>/dev/null || echo "v0.0.0")
-
-# If `.giti_tag` exists, use its last line instead (to preserve local history), but ensure it's not behind
-if [[ -f .giti_tag ]]; then
-  LOCAL_TAG=$(tail -n1 .giti_tag)
-  # Compare semantic version order: choose whichever is greater
-  if [[ "$(printf "%s\n%s" "$LOCAL_TAG" "$LAST_TAG" | sort -V | tail -n1)" == "$LOCAL_TAG" ]]; then
-    LAST_TAG="$LOCAL_TAG"
-  fi
+# Determine the highest existing version tag (vMAJOR.MINOR.PATCH)
+LAST_TAG=$(git tag --list 'v*' | sort -V | tail -n1)
+if [[ -z "$LAST_TAG" ]]; then
+  LAST_TAG="v0.0.0"
 fi
 
 # Strip leading 'v' and split into components
 VER=${LAST_TAG#v}
 IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
 
-# Increment patch version
+# Increment patch version for the new tag
 PATCH=$((PATCH + 1))
 NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
 
-# Record new tag into .giti_tag
-echo "$NEW_TAG" > .giti_tag
+# Record the new tag in .giti_tag (append to preserve history)
+echo "$NEW_TAG" >> .giti_tag
 
 # Prepare prefix for commit message
 PREFIX="[$NEW_TAG]"
@@ -52,14 +46,19 @@ COMMIT_MSG="$PREFIX $MSG"
 # Stage all changes
 git add .
 
-# Na raiz do repositório local
+
+# Na raiz do repositório local;
 gh release create "$NEW_TAG" \
   --title "$COMMIT_MSG"
 
-# Create and push the new tag
-git tag "$NEW_TAG"
+# Ensure we are on the master branch
+git checkout master
+
+# Create and push the new tag on master branch;
+git tag "$NEW_TAG" master
 git commit -m "$COMMIT_MSG"
-git push origin master "$NEW_TAG"
+# git push origin "$NEW_TAG"
+git push origin master
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
