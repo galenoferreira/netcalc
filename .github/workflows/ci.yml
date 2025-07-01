@@ -1,186 +1,7 @@
-# Name of the workflow that appears in GitHub Actions UI
-name: CI / CD Pipeline
-
-# Grant write permissions to the GITHUB_TOKEN for creating releases
-permissions:
-  contents: write
-
-# Define when this workflow will run
-on:
-  push:
-    branches:
-      - master    # Run on pushes to master branch
-    tags:
-      - 'v*'     # Run on version tags (e.g., v1.0.0)
-  workflow_dispatch:  # Allow manual triggering of the workflow
-
-jobs:
-  # Lint job: Runs code quality checks
-  lint:
-    # Skip on tag pushes (only run on branch pushes)
-    if: "!startsWith(github.ref, 'refs/tags/')"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3  # Checkout the repository code
-
-      # Set up Go environment
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.20'
-
-      # Run golangci-lint with specified version and config
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: v1.64.8
-          config: .golangci.yml
-
-  # Test job: Runs unit tests and uploads coverage
-  test:
-    if: "!startsWith(github.ref, 'refs/tags/')"
-    runs-on: ubuntu-latest
-    needs: lint  # Wait for lint job to complete
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.20'
-
-      # Ensure dependencies are up to date
-      - name: Download dependencies
-        run: go mod tidy
-
-      # Cache Go modules to speed up builds
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      # Run tests with verbose output
-      - name: Run tests
-        run: go test ./... -v
-
-      # Generate coverage report
-      - name: Run coverage
-        run: go test ./... -coverprofile=coverage.out
-
-      # Upload coverage to Codecov
-      - name: Upload coverage to Codecov
-        run: |
-          curl -s https://codecov.io/bash | bash -s -- -t ${{ secrets.CODECOV_TOKEN }} -f coverage.out
-
-  # Build job: Compiles binaries for multiple platforms
-  build:
-    needs: [lint, test]  # Wait for both lint and test jobs
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # Build for multiple OS and CPU architectures
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        arch: [amd64, arm64]
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.20'
-
-      - name: Download dependencies
-        run: go mod tidy
-
-      # Cache Go modules
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      # Cross-compile for each OS/architecture combination
-      - name: Build binary
-        run: |
-          GOOS=${{ matrix.os == 'windows-latest' && 'windows' || (matrix.os == 'macos-latest' && 'darwin' || 'linux') }} \
-          GOARCH=${{ matrix.arch }} \
-          go build -ldflags="-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') -X main.gitCommit=$(git rev-parse --short HEAD) -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD)" \
-            -o "bin/${{ matrix.os }}_${{ matrix.arch }}/netcalc${{ matrix.os == 'windows-latest' && '.exe' || '' }}" netcalc.go
-
-      # Save compiled binaries as artifacts
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: netcalc-${{ matrix.os }}-${{ matrix.arch }}
-          path: bin/${{ matrix.os }}_${{ matrix.arch }}/
-
-  # Release job: Creates GitHub release when a version tag is pushed
-  release-on-tag:
-    needs: build  # Wait for build job to complete
-    if: startsWith(github.ref, 'refs/tags/')  # Only run on version tags
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      # Create a new GitHub release
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-
-      # Upload Windows AMD64 binary
-      - name: Upload Release Assets (windows-amd64)
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/windows-latest_amd64/netcalc.exe
-          asset_name: netcalc-windows-amd64.exe
-          asset_content_type: application/octet-stream
-
-      # Upload Linux AMD64 binary
-      - name: Upload Release Assets (linux-amd64)
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/ubuntu-latest_amd64/netcalc
-          asset_name: netcalc-linux-amd64
-          asset_content_type: application/octet-stream
-
-      # Upload macOS AMD64 binary
-      - name: Upload Release Assets (macos-amd64)
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/macos-latest_amd64/netcalc
-          asset_name: netcalc-macos-amd64
-          asset_content_type: application/octet-stream
-
-      # Upload macOS ARM64 binary
-      - name: Upload Release Assets (macos-arm64)
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/macos-latest_arm64/netcalc
-          asset_name: netcalc-macos-arm64
-          asset_content_type: application/octet-stream
 # CI / CD Pipeline for netcalc
 name: CI / CD Pipeline
 
-# Allow workflow on pushes to master branch, version tags, and manual triggers
+# Trigger on pushes to master, version tags, or manual dispatch
 on:
   push:
     branches:
@@ -189,23 +10,22 @@ on:
       - 'v*'
   workflow_dispatch:
 
-# Grant write access to GitHub token for release creation
+# Grant GitHub token write permissions for creating releases
 permissions:
   contents: write
 
 jobs:
   # ---------------------------------------------------------------------------
-  # Lint job: checks Go code quality via golangci-lint
+  # Lint job: validate code style and static analysis
   # ---------------------------------------------------------------------------
   lint:
-    # Only run on branch pushes, skip tag-triggered runs
     if: "!startsWith(github.ref, 'refs/tags/')"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Go environment
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.20'
@@ -217,22 +37,22 @@ jobs:
           config: .golangci.yml
 
   # ---------------------------------------------------------------------------
-  # Test job: runs unit tests and uploads code coverage
+  # Test job: execute unit tests and upload coverage
   # ---------------------------------------------------------------------------
   test:
     if: "!startsWith(github.ref, 'refs/tags/')"
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Go environment
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.20'
 
-      - name: Download dependencies
+      - name: Install dependencies
         run: go mod tidy
 
       - name: Cache Go modules
@@ -242,24 +62,22 @@ jobs:
             ~/.cache/go-build
             ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          restore-keys: ${{ runner.os }}-go-
 
-      - name: Run tests with verbose output
+      - name: Run tests
         run: go test ./... -v
 
-      - name: Generate coverage profile
+      - name: Generate coverage
         run: go test ./... -coverprofile=coverage.out
 
-      - name: Upload coverage report to Codecov
-        # Use bash uploader with repository token to avoid rate limits
+      - name: Upload coverage to Codecov
         run: |
           curl -s https://codecov.io/bash | bash -s -- \
             -t ${{ secrets.CODECOV_TOKEN }} \
             -f coverage.out
 
   # ---------------------------------------------------------------------------
-  # Build job: compiles binaries for Windows, Linux, and macOS (amd64 & arm64)
+  # Build job: cross-compile binaries for multiple platforms
   # ---------------------------------------------------------------------------
   build:
     needs: [lint, test]
@@ -269,15 +87,15 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
         arch: [amd64, arm64]
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Go environment
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.20'
 
-      - name: Download dependencies
+      - name: Install dependencies
         run: go mod tidy
 
       - name: Cache Go modules
@@ -287,12 +105,11 @@ jobs:
             ~/.cache/go-build
             ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          restore-keys: ${{ runner.os }}-go-
 
       - name: Cross-compile binary
         run: |
-          # Determine GOOS and GOARCH based on matrix
+          # Set target OS
           GOOS=$(
             if [ "${{ matrix.os }}" = "windows-latest" ]; then
               echo windows
@@ -303,7 +120,7 @@ jobs:
             fi
           )
           GOARCH=${{ matrix.arch }}
-          # Build with version metadata via ldflags
+          # Build with version info
           go build \
             -ldflags="-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
                       -X main.gitCommit=$(git rev-parse --short HEAD) \
@@ -311,24 +128,24 @@ jobs:
             -o "bin/${{ matrix.os }}_${{ matrix.arch }}/netcalc${{ matrix.os == 'windows-latest' && '.exe' || '' }}" \
             netcalc.go
 
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: netcalc-${{ matrix.os }}-${{ matrix.arch }}
           path: bin/${{ matrix.os }}_${{ matrix.arch }}/
 
   # ---------------------------------------------------------------------------
-  # Release job: creates a GitHub release on version tag
+  # Release job: create GitHub release on new tag
   # ---------------------------------------------------------------------------
   release-on-tag:
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create GitHub Release
+      - name: Create release
         id: create_release
         uses: actions/create-release@v1
         with:
@@ -338,7 +155,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload release assets
+      - name: Upload Windows artifact
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -346,7 +163,7 @@ jobs:
           asset_name: netcalc-windows-amd64.exe
           asset_content_type: application/octet-stream
 
-      - name: Upload release assets (linux-amd64)
+      - name: Upload Linux artifact
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -354,7 +171,7 @@ jobs:
           asset_name: netcalc-linux-amd64
           asset_content_type: application/octet-stream
 
-      - name: Upload release assets (macos-amd64)
+      - name: Upload macOS AMD64 artifact
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -362,7 +179,7 @@ jobs:
           asset_name: netcalc-macos-amd64
           asset_content_type: application/octet-stream
 
-      - name: Upload release assets (macos-arm64)
+      - name: Upload macOS ARM64 artifact
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
