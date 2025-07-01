@@ -1,6 +1,7 @@
 # GitHub Actions workflow for CI/CD of the netcalc project.
 # This pipeline lints, tests, builds, and releases the application.
 
+
 name: CI_CD_Pipeline
 
 # Workflow triggers:

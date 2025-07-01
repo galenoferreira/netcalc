@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Remember current directory
+# Remember current directory;
 CUR_DIR=$(pwd)
 # Change to repository directory (ensure REP_DIR is set or use current)
 cd "${REP_DIR:-$CUR_DIR}" || exit 1

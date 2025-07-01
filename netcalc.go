@@ -224,7 +224,7 @@ EXAMPLES
 
 `
 
-// printManual outputs the embedded manual text to stdout.
+// printManual outputs the embedded manual text to stdout
 func printManual() {
 	fmt.Print(manualText)
 }
