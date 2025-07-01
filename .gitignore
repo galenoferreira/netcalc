@@ -1,12 +1,8 @@
-.gitignore
 cidrcalc_key
 cidrcalc_key.pub
 
-# Binaries for programs and plugins
-/bin/
 
 # Build outputs
-/bin/
 *.exe
 *.exe~
 *.dll
@@ -40,7 +36,3 @@ Thumbs.db
 # Temporary files
 *~
 
-# Pricavy and Security
-*key*
-giti.sh
-env_*
