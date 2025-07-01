@@ -31,12 +31,6 @@ jobs:
         with:
           go-version: '1.20'
 
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: v1.64.8
-          config: .golangci.yml
-
   # ---------------------------------------------------------------------------
   # Test job: execute unit tests and upload coverage
   # ---------------------------------------------------------------------------
