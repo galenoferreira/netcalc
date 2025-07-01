@@ -13,6 +13,7 @@
  *                       -X main.gitCommit=$(git rev-parse --short HEAD) \
  *                       -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD)" \
  *     -o netcalc
+ *
  */
 
 package main
