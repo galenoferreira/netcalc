@@ -65,13 +65,6 @@ jobs:
       - name: Generate coverage
         run: go test ./... -coverprofile=coverage.out
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }} # Opcional se o repo for público
-          files: coverage.out
-          fail_ci_if_error: true
-
   # ---------------------------------------------------------------------------
   # Build job: cross-compile binaries for multiple platforms
   # ---------------------------------------------------------------------------
