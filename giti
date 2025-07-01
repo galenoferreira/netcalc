@@ -6,11 +6,19 @@ CUR_DIR=$(pwd)
 # Change to repository directory (ensure REP_DIR is set or use current)
 cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
-# Determine last version tag
+# Fetch all tags from origin to ensure we see the latest version
+git fetch --tags origin
+
+# Determine the last version tag from remote, defaulting to v0.0.0 if none
+LAST_TAG=$(git describe --tags --abbrev=0 origin/master 2>/dev/null || echo "v0.0.0")
+
+# If `.giti_tag` exists, use its last line instead (to preserve local history), but ensure it's not behind
 if [[ -f .giti_tag ]]; then
-  LAST_TAG=$(<.giti_tag)
-else
-  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+  LOCAL_TAG=$(tail -n1 .giti_tag)
+  # Compare semantic version order: choose whichever is greater
+  if [[ "$(printf "%s\n%s" "$LOCAL_TAG" "$LAST_TAG" | sort -V | tail -n1)" == "$LOCAL_TAG" ]]; then
+    LAST_TAG="$LOCAL_TAG"
+  fi
 fi
 
 # Strip leading 'v' and split into components
@@ -46,16 +54,15 @@ git add .
 
 # Na raiz do repositório local
 gh release create "$NEW_TAG" \
-  --title "$NEW_TAG — $COMMIT_MSG"
+  --title "$COMMIT_MSG"
 
 # Create and push the new tag
 git tag "$NEW_TAG"
 git push origin "$NEW_TAG"
 
 # Commit to master
-git commit -m "$NEW_TAG: $COMMIT_MSG"
+git commit -m "$COMMIT_MSG"
 git push origin master
-
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
