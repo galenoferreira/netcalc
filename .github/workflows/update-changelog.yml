@@ -1,0 +1,30 @@
+name: Update CHANGELOG
+
+# Dispara quando uma Release é publicada
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # precisamos de permissão para commitar de volta
+          persist-credentials: true
+
+      - name: Generate CHANGELOG.md from release notes
+        # Usa a CLI gh para extrair notas da última tag
+        run: |
+          TAG=$(gh release view --json tagName --jq .tagName)
+          gh release view "$TAG" --json body --jq .body > CHANGELOG.md
+
+      - name: Commit and push CHANGELOG.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: update CHANGELOG for $TAG"
+          git push
