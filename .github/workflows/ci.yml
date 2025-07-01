@@ -66,10 +66,11 @@ jobs:
         run: go test ./... -coverprofile=coverage.out
 
       - name: Upload coverage to Codecov
-        run: |
-          curl -s https://codecov.io/bash | bash -s -- \
-            -t ${{ secrets.CODECOV_TOKEN }} \
-            -f coverage.out
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # Opcional se o repo for público
+          files: coverage.out
+          fail_ci_if_error: true
 
   # ---------------------------------------------------------------------------
   # Build job: cross-compile binaries for multiple platforms
