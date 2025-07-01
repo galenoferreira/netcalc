@@ -1,3 +1,5 @@
+// Package main implements netcalc, a CLI IPv4 subnet calculator with
+// support for interactive menus, single-command invocation, and detailed output.
 /*
  * netcalc - IPv4 Subnet Calculator
  *
@@ -25,13 +27,21 @@ import (
 	"strings"
 )
 
+// Version information populated via ldflags at build time.
 var buildTime string // build timestamp
 var gitCommit string // git commit hash
 var gitBranch string // git branch name
 
+// ErrHelp is returned by parseInput when the user requests help.
 var ErrHelp = errors.New("help requested")
 
-// parseInput parses command-line arguments into an IP string and prefix length.
+// parseInput parses the provided command-line arguments and returns
+// an IP string and prefix length. Supports:
+//   - No arguments: returns ErrHelp
+//   - Single argument with CIDR format "IP/prefix"
+//   - Two arguments: "IP mask" (dotted mask) or "IP prefix" (numeric)
+//
+// It validates IP format and prefix/mask ranges.
 func parseInput(args []string) (string, uint, error) {
 	if len(args) == 0 {
 		return "", 0, ErrHelp
@@ -80,8 +90,12 @@ func parseInput(args []string) (string, uint, error) {
 	return "", 0, fmt.Errorf("unexpected arguments: %v", args)
 }
 
-// netcalc computes and displays detailed subnet information for the given IP and prefix length.
-// It calculates the network address, broadcast address, usable host range, wildcard mask, and total hosts.
+// NetCalc computes and displays comprehensive subnet details:
+//   - Network and broadcast addresses
+//   - Usable host range and total hosts
+//   - Wildcard mask and private-range overflow warnings
+//
+// The output is formatted with emojis and aligned columns.
 func NetCalc(ipStr string, bits uint) {
 	// Convert values
 	maskUint := Netmask(bits)
@@ -93,7 +107,7 @@ func NetCalc(ipStr string, bits uint) {
 	totalHosts := (1 << (32 - bits)) - 2
 	wildcard := ^maskUint
 
-	// Define RFC1918 private network ranges
+	// privateRanges defines RFC1918 private IPv4 blocks to check for overflow.
 	privateRanges := []struct {
 		base   uint32 // network base
 		prefix uint   // CIDR prefix length
@@ -129,18 +143,19 @@ func NetCalc(ipStr string, bits uint) {
 	fmt.Printf("%-25s %d\n", "📊 Total Usable Hosts:", totalHosts)
 }
 
-// Netmask returns a 32-bit network mask for the given prefix length.
+// Netmask returns a 32-bit network mask for a given CIDR prefix length.
+// It shifts a 32-bit all-ones mask left by (32 - bits).
 func Netmask(bits uint) uint32 {
 	return ^uint32(0) << (32 - bits)
 }
 
-// IPToUint32 converts a dotted IP string to a 32-bit integer.
+// IPToUint32 converts an IPv4 string (dotted quad) to its 32-bit uint representation.
 func IPToUint32(ipStr string) uint32 {
 	ip := net.ParseIP(ipStr).To4()
 	return binary.BigEndian.Uint32(ip)
 }
 
-// Uint32ToIP converts a 32-bit integer to a dotted IP string.
+// Uint32ToIP converts a 32-bit integer to an IPv4 dotted-quad string.
 func Uint32ToIP(n uint32) string {
 	var b [4]byte
 	binary.BigEndian.PutUint32(b[:], n)
@@ -166,13 +181,15 @@ EXAMPLES
 
 `
 
-// printManual prints the full built-in manual to stdout.
+// printManual outputs the embedded manual text to stdout.
 func printManual() {
 	fmt.Print(manualText)
 }
 
-// main is the entry point for the netcalc tool.
-// It displays the manual when run without arguments or with help flags.
+// main is the CLI entry point. It handles:
+//   - --help and no-argument cases to show the manual
+//   - Parsing input arguments
+//   - Invoking NetCalc for subnet calculation
 func main() {
 	// If the user provided no args or asked for help, show the manual.
 	if len(os.Args) == 1 || os.Args[1] == "-h" || os.Args[1] == "--help" {
