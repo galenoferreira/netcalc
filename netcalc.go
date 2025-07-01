@@ -78,6 +78,9 @@ func parseInput(args []string) (string, uint, error) {
 				if err != nil {
 					return "", 0, fmt.Errorf("invalid mask octet: %s", p)
 				}
+				if v < 0 || v > 255 {
+					return "", 0, fmt.Errorf("mask octet out of range: %d", v)
+				}
 				maskBytes[i] = byte(v)
 			}
 			ones, bits := net.IPMask(maskBytes[:]).Size()
