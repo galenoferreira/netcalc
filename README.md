@@ -29,7 +29,7 @@ A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
 ## 📦 Installation
 
-Build from source (requires Go):
+Build from source (requires Go!):
 
 ```bash
 go build -ldflags "-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
