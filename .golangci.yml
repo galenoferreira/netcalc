@@ -1,0 +1,76 @@
+# Configuration for golangci-lint
+run:
+  # Timeout for the entire analysis
+  timeout: 5m
+  # Skip generated files
+  skip-dirs:
+    - vendor
+  skip-files:
+    - ".*_gen.go"
+    - ".*\\.pb\\.go"
+  tests: true
+
+linters:
+  enable:
+    - govet          # Reports suspicious constructs
+    - staticcheck    # Go static analysis suite
+    - ineffassign    # Detect ineffectual assignments
+    - errcheck       # Check error returns
+    - gosimple       # Simplifications
+    - unused         # Checks for unused constants, variables, functions, etc.
+    - deadcode       # Finds unused code
+    - gofmt          # Gofmt -s
+    - goimports      # Checks import alignment
+    - depguard       # Restrict imports
+    - gocyclo        # Reports functions with high cyclomatic complexity
+    - dupl           # Reports duplicated code
+    - misspell       # Detects common misspellings
+    - nakedret       # Finds naked returns
+    - whitespace      # Detects trailing whitespace
+    - funlen         # Reports functions that are too long
+
+  disable:
+    - maligned       # Often false positives in small projects
+    - typecheck      # Disabled because govet/staticcheck covers most checks
+
+linters-settings:
+  errcheck:
+    # skip generated errors and common wrappers
+    exclude:
+      - "Close"
+      - "Print.*"
+  gocyclo:
+    min-complexity: 15
+  dupl:
+    threshold: 100
+  depguard:
+    list-type: blacklist
+    packages:
+      - "fmt"
+    exclude-go-root: true
+  funlen:
+    max-lines: 200
+    max-statements: 50
+
+issues:
+  # Exclude common false positives and test data
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - funlen
+        - dupl
+    - text: "error return value not checked"
+      linters:
+        - errcheck
+    - text: "cyclomatic complexity"
+      linters:
+        - gocyclo
+
+  # Maximum issues per linter to report
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+output:
+  # Format output for CI readability
+  format: colored-line-number
+  sort-by: severity

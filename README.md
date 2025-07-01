@@ -1,5 +1,9 @@
 # 🌐 netcalc — IPv4 Subnet Calculator
 
+[![Build Status](https://github.com/galenoferreira/cidrcalc/actions/workflows/ci.yml/badge.svg)](https://github.com/galenoferreira/cidrcalc/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/galenoferreira/cidrcalc)](https://goreportcard.com/report/github.com/galenoferreira/cidrcalc)
+[![codecov](https://codecov.io/gh/galenoferreira/cidrcalc/branch/master/graph/badge.svg?token=)](https://codecov.io/gh/galenoferreira/cidrcalc)
+
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
 ## 🚀 Features
@@ -21,13 +25,18 @@ A single-binary CLI tool for comprehensive IPv4 subnet calculations.
   - `--help`, `-h` — display short usage.
   - `--manual`, `-M` — display full manual.
   - `--version` — show build time, commit, and branch.
+  - `--version` — show build time, git commit, and branch information.
 
 ## 📦 Installation
 
 Build from source (requires Go):
 
 ```bash
-go build -ldflags "-X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+go build -ldflags "-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
                    -X main.gitCommit=$(git rev-parse --short HEAD) \
-                   -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD)" \
+                   -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD')" \
                    -o netcalc netcalc.go
+
+# Display version information
+./netcalc --version
+```
