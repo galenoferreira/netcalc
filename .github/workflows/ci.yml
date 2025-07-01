@@ -117,7 +117,8 @@ jobs:
         run: |
           GOOS=${{ matrix.os == 'windows-latest' && 'windows' || (matrix.os == 'macos-latest' && 'darwin' || 'linux') }} \
           GOARCH=${{ matrix.arch }} \
-          go build -o "bin/${{ matrix.os }}_${{ matrix.arch }}/netcalc${{ matrix.os == 'windows-latest' && '.exe' || '' }}" netcalc.go
+          go build -ldflags="-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') -X main.gitCommit=$(git rev-parse --short HEAD) -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD)" \
+            -o "bin/${{ matrix.os }}_${{ matrix.arch }}/netcalc${{ matrix.os == 'windows-latest' && '.exe' || '' }}" netcalc.go
 
       # Save compiled binaries as artifacts
       - name: Upload artifacts

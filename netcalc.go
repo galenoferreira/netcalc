@@ -27,6 +27,11 @@ import (
 	"strings"
 )
 
+// printVersionInfo outputs the build version details.
+func printVersionInfo() {
+	fmt.Printf("Build Time : %s\nGit Commit : %s\nGit Branch : %s\n", buildTime, gitCommit, gitBranch)
+}
+
 // Version information populated via ldflags at build time.
 var buildTime string // build timestamp
 var gitCommit string // git commit hash
@@ -228,7 +233,13 @@ func main() {
 	// Define CLI flags
 	showBin := flag.Bool("b", false, "Show addresses in binary")
 	showHex := flag.Bool("h", false, "Show addresses in hexadecimal")
+	showVersion := flag.Bool("version", false, "Display version information")
 	flag.Parse()
+
+	if *showVersion {
+		printVersionInfo()
+		return
+	}
 
 	// Remaining args after flags
 	args := flag.Args()
