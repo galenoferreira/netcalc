@@ -35,6 +35,7 @@ echo
 git diff
 
 # Read commit message from user
+# shellcheck disable=SC2162
 read -p "Commit Message: " MSG
 
 # Prefix the commit message
@@ -43,15 +44,18 @@ COMMIT_MSG="$PREFIX $MSG"
 # Stage all changes
 git add .
 
-# Commit with prefixed message
-git commit -m "$COMMIT_MSG"
-
-# Push commit
-git push
+# Na raiz do repositório local
+gh release create "$NEW_TAG" \
+  --title "$NEW_TAG — $COMMIT_MSG"
 
 # Create and push the new tag
 git tag "$NEW_TAG"
 git push origin "$NEW_TAG"
+
+# Commit to master
+git commit -m "$NEW_TAG: $COMMIT_MSG"
+git push origin master
+
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
