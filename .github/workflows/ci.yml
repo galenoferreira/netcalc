@@ -70,12 +70,12 @@ jobs:
   # Build job: cross-compile binaries for multiple platforms
   # ---------------------------------------------------------------------------
   build:
-    needs: [lint, test]
+    needs: [ lint, test ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        arch: [amd64, arm64]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        arch: [ amd64, arm64 ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -114,7 +114,7 @@ jobs:
           go build \
             -ldflags="-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
                       -X main.gitCommit=$(git rev-parse --short HEAD) \
-                      -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD')" \
+                      -X main.gitBranch=$(git rev-parse --abbrev-ref HEAD)" \
             -o "bin/${{ matrix.os }}_${{ matrix.arch }}/netcalc${{ matrix.os == 'windows-latest' && '.exe' || '' }}" \
             netcalc.go
 
