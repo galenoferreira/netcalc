@@ -58,11 +58,8 @@ gh release create "$NEW_TAG" \
 
 # Create and push the new tag
 git tag "$NEW_TAG"
-git push origin "$NEW_TAG"
-
-# Commit to master
 git commit -m "$COMMIT_MSG"
-git push origin master
+git push origin master "$NEW_TAG"
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
