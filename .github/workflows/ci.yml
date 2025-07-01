@@ -1,16 +1,17 @@
 # CI / CD Pipeline for netcalc
 name: CI / CD Pipeline
 
-# Trigger on pushes to master, version tags, or manual dispatch
+# Trigger on pushes to main or master, version tags, or manual dispatch
 on:
   push:
     branches:
+      - main
       - master
     tags:
       - 'v*'
   workflow_dispatch:
 
-# Grant GitHub token write permissions for creating releases
+# Grant GitHub token write permissions for releases
 permissions:
   contents: write
 
@@ -109,7 +110,7 @@ jobs:
 
       - name: Cross-compile binary
         run: |
-          # Set target OS
+          # Determine target OS based on matrix value
           GOOS=$(
             if [ "${{ matrix.os }}" = "windows-latest" ]; then
               echo windows
@@ -120,7 +121,7 @@ jobs:
             fi
           )
           GOARCH=${{ matrix.arch }}
-          # Build with version info
+          # Build with version metadata via ldflags
           go build \
             -ldflags="-X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
                       -X main.gitCommit=$(git rev-parse --short HEAD) \
