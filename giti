@@ -20,7 +20,7 @@ if [ -f "$TAG_FILE" ] && [ -s "$TAG_FILE" ]; then
   PATCH=$((PATCH + 1))
   NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
 else
-  NEW_TAG="v1.0.0"
+  NEW_TAG="v1.0.17"
 fi
 
 echo "Creating semantic tag $NEW_TAG"
