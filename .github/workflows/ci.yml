@@ -167,7 +167,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/windows/netcalc.exe
+          asset_path: bin/windows-latest_amd64/netcalc.exe
           asset_name: netcalc-windows-amd64.exe
           asset_content_type: application/octet-stream
 
@@ -175,7 +175,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/linux/netcalc
+          asset_path: bin/ubuntu-latest_amd64/netcalc
           asset_name: netcalc-linux-amd64
           asset_content_type: application/octet-stream
 
@@ -183,7 +183,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/macos_intel/netcalc
+          asset_path: bin/macos-latest_amd64/netcalc
           asset_name: netcalc-macos-amd64
           asset_content_type: application/octet-stream
 
@@ -191,6 +191,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: bin/mac_apple_silicon/netcalc
-          asset_name: netcalc-macos-apple_silicon
+          asset_path: bin/macos-latest_arm64/netcalc
+          asset_name: netcalc-macos-arm64
           asset_content_type: application/octet-stream
