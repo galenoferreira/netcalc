@@ -1,4 +1,4 @@
-name: Automatic CHANGELOG Update
+name: CI Pipeline - Build, Test & Deploy
 description: "Workflow to generate and automatically update CHANGELOG.md when a release is published"
 
 on:

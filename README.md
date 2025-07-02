@@ -9,21 +9,6 @@ A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
 - **Subnet Calculations**: network, broadcast, usable host range, total hosts.
 - **Mask Utilities**: network mask, wildcard mask, hexadecimal mask.
-- **Optional Displays**:
-  - `-b` show binary representation of IP, mask, network, and broadcast.
-  - `-h` show hexadecimal representation of IP, mask, network, and broadcast.
-- **Interactive Mode**: run without arguments for a menu-driven interface.
-- **Flags** for quick operations:
-  - `-c <IP/CIDR>` — CIDR notation calculation.
-  - `-i <IP> <mask>` — IP + dotted mask or numeric prefix.
-  - `-w <IP/CIDR>` — wildcard mask only.
-  - `-W <wildcard>` — convert wildcard mask to prefix.
-  - `-I <network> <IP>` — check IP inclusion in network.
-  - `-l <network>` — list all usable hosts.
-  - `-n <network>` — previous and next subnet.
-  - `--help`, `-h` — display short usage.
-  - `--manual`, `-M` — display full manual.
-  - `--version` — show build time, git commit, and branch information.
 
 ## Installation
 
@@ -95,4 +80,29 @@ Below are some Git commands and other tools that have helped resolve common issu
 - `gh release upload <tag> bin/*/* --clobber`  
   *Attaches all compiled binaries to a GitHub Release in one command, automating asset uploads.*
 
-Feel free to add or customize commands as new tooling or workflows are introduced.
+
+### 🔖 Tags and Releases Management
+
+- **Create a new tag manually**
+  ```bash
+  git tag v1.0.0
+  git push origin v1.0.0
+  ```
+
+- **Create a release from a tag using GitHub CLI**
+  ```bash
+  gh release create v1.0.0 --title "Release v1.0.0" --notes "Release description or changelog"
+  ```
+
+- **Remove a local and remote tag**
+  ```bash
+  git tag -d v0.0.1-test
+  git push --delete origin v0.0.1-test
+  ```
+
+- **Remove a release from GitHub using GitHub CLI**
+  ```bash
+  gh release delete v0.0.1-test --yes
+  ```
+
+These commands are helpful when managing incorrect tags, cleaning up testing releases, or fixing mistakes in published versions.
