@@ -1,3 +1,3 @@
-# Changelog
+# Changelog auto populate
 - Teste do workflow de atualização do CHANGELOG
-- Verificação da integração
+- Verificação FINAL da integração
