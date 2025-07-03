@@ -1,7 +1,8 @@
-name: PROD-CI/CD Pipeline
+name: MAIN CD-CI Workflow
 on:
   push:
     branches: [ main ]
+    tags: ['v*']
   pull_request:
     branches: [ main ]
   release:
@@ -15,11 +16,11 @@ env:
   # Git Configuration
   GIT_USER: "github-actions[bot]"
   GIT_EMAIL: "actions@github.com"
-  
+
   # Build Configuration
   GO_VERSION: '1.20'
   UBUNTU_VERSION: 'ubuntu-latest'
-  
+
   # Authentication
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -28,9 +29,11 @@ defaults:
     shell: bash
 
 jobs:
-  verify:
-    name: PROD-Build & Test
-    if: github.event_name != 'release'
+  main-verify:
+    name: MAIN-Build & Test
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+      || github.event_name == 'pull_request'
     runs-on: ${{ env.UBUNTU_VERSION }}
     concurrency:
       group: ${{ github.workflow }}-verify-${{ github.ref }}
@@ -51,8 +54,8 @@ jobs:
       - name: PROD-Run Tests
         run: go test -v ./...
 
-  changelog:
-    name: PROD-Update Documentation
+  main-changelog:
+    name: MAIN-Update Documentation
     if: github.event_name == 'release'
     runs-on: ubuntu-22.04
     steps:
@@ -83,11 +86,11 @@ jobs:
             git push origin main
           fi
 
-  deploy:
-    name: PROD-Production Deployment
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  main-deploy:
+    name: MAIN-Production Deployment
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ${{ env.UBUNTU_VERSION }}
-    needs: verify
+    needs: main-verify
     steps:
       - name: PROD-Checkout Repository
         uses: actions/checkout@v4
