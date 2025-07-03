@@ -4,7 +4,17 @@ set -euo pipefail
 # Remember current directory;
 CUR_DIR=$(pwd)
 # Change to repository directory (ensure REP_DIR is set or use current)
+
 cd "${REP_DIR:-$CUR_DIR}" || exit 1
+
+# Commit and push any workflow updates without triggering Actions
+if git diff --quiet .github/workflows/main.yml; then
+  echo "No workflow changes to commit."
+else
+  git add .github/workflows/main.yml
+  git commit -m "[skip ci] chore: update main workflow"
+  git push origin master
+fi
 
 ./build
 
