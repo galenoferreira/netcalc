@@ -58,3 +58,17 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package and Upload Binaries
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          # For each subdirectory in ./bin, create a zip and upload as release asset
+          for path in bin/*; do
+            if [ -d "$path" ]; then
+              dir=$(basename "$path")
+              zip -r "${dir}.zip" "$path"
+              gh release upload "$TAG" "${dir}.zip" --clobber
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
