@@ -59,16 +59,32 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Package and Upload Binaries
+
+  test-binaries:
+    name: Test Binaries on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: update-changelog
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Install GitHub CLI
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            choco install gh
+          else
+            sudo apt-get update && sudo apt-get install -y gh
+          fi
+      - name: Download release assets
         run: |
           TAG=${{ github.event.release.tag_name }}
-          # For each subdirectory in ./bin, create a zip and upload as release asset
-          for path in bin/*; do
-            if [ -d "$path" ]; then
-              dir=$(basename "$path")
-              zip -r "${dir}.zip" "$path"
-              gh release upload "$TAG" "${dir}.zip" --clobber
-            fi
-          done
+          gh release download "$TAG" --pattern "bin/${{ matrix.os }}/*"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run binary tests
+        shell: bash
+        run: |
+          # Adjust the path and test command as needed
+          BINARY=$(ls bin/${{ matrix.os }}/* | head -n1)
+          chmod +x "$BINARY"
+          "$BINARY" --run-tests
