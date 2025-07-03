@@ -66,11 +66,19 @@ case "$1" in
 #!/bin/bash
 # Carrega o script de configuração do Conda
 source "$(conda info --base)/etc/profile.d/conda.sh"
+
 # Ativa o ambiente
 conda activate $CONDA_ENV
+
+# Adiciona variavel com o nome do repositorio
+GITHUB_REPO=$CONDA_ENV
+
+export GITHUB_REPO
 # Adiciona o diretório atual ao PATH
+
 REP_DIR=$(pwd)
 export REP_DIR
+
 export COMPOSE_BAKE=true
 PATH="$PATH:."
 export LC_ALL="pt_BR.UTF-8"
