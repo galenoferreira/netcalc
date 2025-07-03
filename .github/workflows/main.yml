@@ -38,20 +38,34 @@ jobs:
       - name: Install GitHub CLI
         run: sudo apt-get install gh -y
 
-      - name: Generate CHANGELOG.md from the release
+      - name: Generate and update CHANGELOG.md
         run: |
           TAG=${{ github.event.release.tag_name }}
-          gh release view "$TAG" --json body --jq .body > CHANGELOG.md
+          # Determine previous tag (if any)
+          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | grep -v "$TAG" | head -n1 || echo "")
+          # Header for this release
+          echo "## ${TAG} - $(date -u +%Y-%m-%d)" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          # Release notes body
+          echo "**Release Notes:**" >> CHANGELOG.md
+          gh release view "$TAG" --json body --jq .body | sed 's/^/  /' >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          # Commits since previous tag
+          if [[ -n "$PREV_TAG" ]]; then
+            echo "**Commits since ${PREV_TAG}:**" >> CHANGELOG.md
+            git log "${PREV_TAG}...${TAG}" --pretty=format:"- %s (%an)" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit and push changes
+      - name: Commit and push CHANGELOG updates
         run: |
+          TAG=${{ github.event.release.tag_name }}
           git add CHANGELOG.md
-
-          # Check if there are changes to commit
           if ! git diff --staged --quiet; then
-            git commit -m "docs: update CHANGELOG for ${{ github.event.release.tag_name }}"
+            git commit --author="Release Bot <noreply@github.com>" \
+                       -m "docs(changelog): update CHANGELOG for ${TAG}"
             git push origin master
           else
             echo "No changes to commit"
