@@ -59,13 +59,14 @@ Below are some Git commands and other tools that have helped resolve common issu
 - `git fetch origin --tags --force`  
   *Fixes conflicts with existing tags on the remote when pushing new tags, ensuring the CI/CD pipeline picks up the correct tag for release.*
 
-- `git reset --hard origin/master`  
+- `git reset --hard origin/mains`  
   *Resets the local `master` branch to match the remote `origin/master`, discarding divergent local commits and resolving push rejections.*
 
 - `git push origin master --force-with-lease`  
-  *Safely force-pushes the local `master` branch to the remote, only if no one else has updated upstream, preventing “non-fast-forward” errors.*
+  *Safely force-pushes the local `main` branch to the remote, only if no one else has updated upstream, preventing
+  “non-fast-forward” errors.*
 
-- `git pull --rebase origin master`  
+- `git pull --rebase origin main`  
   *Rebases local commits on top of the latest remote `master`, keeping history linear and avoiding merge conflicts.*
 
 - `go mod tidy`  
