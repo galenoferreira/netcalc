@@ -8,36 +8,35 @@ cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
 ./build
 
-# Fetch all tags from origin to ensure we have the latest versions
-git fetch --tags origin
-
-# Read the last tag from .giti_tag (fallback to v0.0.0 if missing)
-if [[ -f .giti_tag && -s .giti_tag ]]; then
-  LAST_TAG=$(tail -n1 .giti_tag)
-else
-  LAST_TAG="v0.0.0"
+# Ensure .giti_tag exists with initial tag v1.1.01
+if [[ ! -f .giti_tag ]]; then
+  echo "v1.1.01" > .giti_tag
 fi
+
+# Read the last tag from .giti_tag
+LAST_TAG=$(tail -n1 .giti_tag)
 
 # Strip leading 'v' and split into components
 VER=${LAST_TAG#v}
 IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
 
-# Increment version with carry at 99
-PATCH=$((PATCH + 1))
+# Increment patch with carry at 99
+PATCH=$((10#$PATCH + 1))
 if (( PATCH > 99 )); then
   PATCH=1
-  MINOR=$((MINOR + 1))
+  MINOR=$((10#$MINOR + 1))
   if (( MINOR > 99 )); then
     MINOR=1
-    MAJOR=$((MAJOR + 1))
+    MAJOR=$((10#$MAJOR + 1))
   fi
 fi
+
+# Format components to two-digit patch
+printf -v PATCH "%02d" "$PATCH"
 
 # Construct new tag
 NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
 
-# Record the new tag in .giti_tag (append to preserve history)
-echo "$NEW_TAG" >> .giti_tag
 
 # Prepare prefix for commit message
 PREFIX="[$NEW_TAG]"
@@ -79,7 +78,11 @@ git checkout master
 git tag "$NEW_TAG" master
 git commit -m "$COMMIT_MSG"
 # git push origin --tags
+
 git push origin master
+
+# Record the new tag in .giti_tag (append to preserve history)
+echo "$NEW_TAG" >> .giti_tag
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
