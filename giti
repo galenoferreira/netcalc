@@ -6,12 +6,15 @@ CUR_DIR=$(pwd)
 # Change to repository directory (ensure REP_DIR is set or use current)
 cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
+./build
+
 # Fetch all tags from origin to ensure we have the latest versions
 git fetch --tags origin
 
-# Determine the highest existing version tag (vMAJOR.MINOR.PATCH)
-LAST_TAG=$(git tag --list 'v*' | sort -V | tail -n1)
-if [[ -z "$LAST_TAG" ]]; then
+# Read the last tag from .giti_tag (fallback to v0.0.0 if missing)
+if [[ -f .giti_tag && -s .giti_tag ]]; then
+  LAST_TAG=$(tail -n1 .giti_tag)
+else
   LAST_TAG="v0.0.0"
 fi
 
@@ -19,8 +22,18 @@ fi
 VER=${LAST_TAG#v}
 IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
 
-# Increment patch version for the new tag
+# Increment version with carry at 99
 PATCH=$((PATCH + 1))
+if (( PATCH > 99 )); then
+  PATCH=1
+  MINOR=$((MINOR + 1))
+  if (( MINOR > 99 )); then
+    MINOR=1
+    MAJOR=$((MAJOR + 1))
+  fi
+fi
+
+# Construct new tag
 NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
 
 # Record the new tag in .giti_tag (append to preserve history)
@@ -49,9 +62,14 @@ git add .
 gh release create "$NEW_TAG" \
   --title "$COMMIT_MSG"
 
-# Upload each binary file in the bin subdirectories
+# Upload each binary file in the bin subdirectories with unique asset names
 for artifact in bin/*/*; do
-  [ -f "$artifact" ] && gh release upload "$NEW_TAG" "$artifact" --clobber
+  if [ -f "$artifact" ]; then
+    dir_name=$(basename "$(dirname "$artifact")")
+    base_name=$(basename "$artifact")
+    asset_name="${dir_name}-${base_name}"
+    gh release upload "$NEW_TAG" "$artifact" --clobber
+  fi
 done
 
 # Ensure we are on the master branch
