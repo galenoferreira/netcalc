@@ -1,7 +1,7 @@
 # 🌐 netcalc — IPv4 Subnet Calculator
 
 [![CI Build Status](https://github.com/galenoferreira/netcalc/actions/workflows/ci.yml/badge.svg)](https://github.com/galenoferreira/netcalc/actions/workflows/ci.yml)
-[![Codecov](https://codecov.io/gh/galenoferreira/netcalc/branch/master/graph/badge.svg)](https://codecov.io/gh/galenoferreira/netcalc)
+[![Codecov](https://codecov.io/gh/galenoferreira/netcalc/branch/main/graph/badge.svg)](https://codecov.io/gh/galenoferreira/netcalc)
 
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
@@ -60,7 +60,7 @@ Below are some Git commands and other tools that have helped resolve common issu
   *Fixes conflicts with existing tags on the remote when pushing new tags, ensuring the CI/CD pipeline picks up the correct tag for release.*
 
 - `git reset --hard origin/main`  
-  *Resets the local `main` branch to match the remote `origin/master`, discarding divergent local commits and resolving
+  *Resets the local `main` branch to match the remote `origin/main`, discarding divergent local commits and resolving
   push rejections.*
 
 - `git push origin main --force-with-lease`  
@@ -68,7 +68,7 @@ Below are some Git commands and other tools that have helped resolve common issu
   “non-fast-forward” errors.*
 
 - `git pull --rebase origin main`  
-  *Rebases local commits on top of the latest remote `master`, keeping history linear and avoiding merge conflicts.*
+  *Rebases local commits on top of the latest remote `main`, keeping history linear and avoiding merge conflicts.*
 
 - `go mod tidy`  
   *Generates missing `go.sum` entries and removes unused dependencies, fixing build errors related to missing modules.*
