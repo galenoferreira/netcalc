@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# noinspection GrazieInspection
 """
 deploy.py - Deployment script for Go repositories.
 Usage: deploy.py [--build] [--test] [--commit MESSAGE] [--tag TAG]

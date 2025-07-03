@@ -1,0 +1,103 @@
+name: PROD-CI/CD Pipeline
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  # Git Configuration
+  GIT_USER: "github-actions[bot]"
+  GIT_EMAIL: "actions@github.com"
+  
+  # Build Configuration
+  GO_VERSION: '1.20'
+  UBUNTU_VERSION: 'ubuntu-latest'
+  
+  # Authentication
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: PROD-Build & Test
+    if: github.event_name != 'release'
+    runs-on: ${{ env.UBUNTU_VERSION }}
+    concurrency:
+      group: ${{ github.workflow }}-verify-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: PROD-Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: PROD-Setup Go Environment
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: 'go'
+
+      - name: PROD-Build Application
+        run: go build -v ./...
+
+      - name: PROD-Run Tests
+        run: go test -v ./...
+
+  changelog:
+    name: PROD-Update Documentation
+    if: github.event_name == 'release'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: PROD-Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PROD-Configure Git
+        run: |
+          git config user.name "${{ env.GIT_USER }}"
+          git config user.email "${{ env.GIT_EMAIL }}"
+          git checkout main
+
+      - name: PROD-Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh
+
+      - name: PROD-Update Changelog
+        run: gh release view "${{ github.event.release.tag_name }}" --json body --jq .body > CHANGELOG.md
+
+      - name: PROD-Commit Changes
+        run: |
+          git add CHANGELOG.md
+          if ! git diff --staged --quiet; then
+            git commit -m "docs: atualizar CHANGELOG para ${{ github.event.release.tag_name }}"
+            git push origin main
+          fi
+
+  deploy:
+    name: PROD-Production Deployment
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ${{ env.UBUNTU_VERSION }}
+    needs: verify
+    steps:
+      - name: PROD-Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: PROD-Deploy to Production
+        run: |
+          chmod +x ./deploy.py
+          ./deploy.py --build --test \
+            --commit "ci: implantação em produção" \
+            --tag "release-${{ github.run_number }}"
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+          REP_DIR: ${{ github.workspace }}
