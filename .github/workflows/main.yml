@@ -1,4 +1,4 @@
-name: CI Pipeline - Build, Test & Deploy.
+name: CI Pipeline - v.1.0
 description: "Workflow to generate and automatically update CHANGELOG.md when a release is published"
 
 on:
