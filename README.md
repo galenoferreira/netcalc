@@ -1,7 +1,6 @@
 # 🌐 netcalc — IPv4 Subnet Calculator
 
-[![CI Build Status](https://github.com/galenoferreira/netcalc/actions/workflows/ci.yml/badge.svg)](https://github.com/galenoferreira/netcalc/actions/workflows/ci.yml)
-[![Codecov](https://codecov.io/gh/galenoferreira/netcalc/branch/master/graph/badge.svg)](https://codecov.io/gh/galenoferreira/netcalc)
+[![CI/CD Pipeline](https://github.com/galenoferreira/netcalc/actions/workflows/main.yml/badge.svg)](https://github.com/galenoferreira/netcalc/actions/workflows/main.yml)
 
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
