@@ -1,4 +1,4 @@
-name: MAIN CD-CI Workflow
+name: CI/CD Pipeline
 on:
   push:
     branches: [ main ]
@@ -29,8 +29,8 @@ defaults:
     shell: bash
 
 jobs:
-  main-verify:
-    name: MAIN-Build & Test
+  build-and-test:
+    name: Build and Test
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main')
       || github.event_name == 'pull_request'
@@ -54,8 +54,8 @@ jobs:
       - name: PROD-Run Tests
         run: go test -v ./...
 
-  main-changelog:
-    name: MAIN-Update Documentation
+  update-changelog:
+    name: Update Changelog
     if: github.event_name == 'release'
     runs-on: ubuntu-22.04
     steps:
@@ -86,11 +86,11 @@ jobs:
             git push origin main
           fi
 
-  main-deploy:
-    name: MAIN-Production Deployment
+  deploy-production:
+    name: Deploy to Production
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ${{ env.UBUNTU_VERSION }}
-    needs: main-verify
+    needs: build-and-test
     steps:
       - name: PROD-Checkout Repository
         uses: actions/checkout@v4
