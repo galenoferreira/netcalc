@@ -42,3 +42,10 @@
 **Commits since v1.1.52:**
 - docs(changelog): update for (Release Bot)
 - [v1.1.52] STABLE version (galenogarbe-public)
+## v1.1.54 - 2025-07-04
+
+**Release Notes:**
+  **Full Changelog**: https://github.com/galenoferreira/netcalc/compare/v1.1.53...v1.1.54
+
+**Commits since v1.1.53:**
+- docs(changelog): update for (Release Bot)
