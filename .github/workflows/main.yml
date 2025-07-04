@@ -61,6 +61,9 @@ jobs:
           git config user.email "${{ env.GIT_EMAIL }}"
           git checkout main
 
+      - name: Sync with remote main
+        run: git pull origin main
+
       - name: Install GitHub CLI
         run: |
           sudo apt-get update
@@ -74,13 +77,10 @@ jobs:
 
       - name: Commit Changes
         run: |
-          # Sync with remote main to avoid conflicts
-          git pull --rebase --autostash origin main
           git add CHANGELOG.md
           if ! git diff --staged --quiet; then
             git commit -m "docs: atualizar CHANGELOG para ${{ github.event.release.tag_name }}"
             git push origin main
-          fi
 
   deploy-production:
     name: Deploy to Production
