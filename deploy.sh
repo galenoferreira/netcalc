@@ -63,5 +63,7 @@ for artifact in bin/*/*; do
   fi
 done
 
+git add .
+
 # Return to original directory
 cd "$CUR_DIR" || exit 1
