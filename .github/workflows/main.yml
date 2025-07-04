@@ -51,8 +51,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GIT_USER: ${{ env.GIT_USER }}
-      GIT_EMAIL: ${{ env.GIT_EMAIL }}
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
