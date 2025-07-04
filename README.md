@@ -1,5 +1,7 @@
 # 🌐 netcalc — IPv4 Subnet Calculator by GG
 
+[![CI/CD Pipeline](https://github.com/galenoferreira/netcalc/actions/workflows/main.yml/badge.svg)](https://github.com/galenoferreira/netcalc/actions/workflows/main.yml)
+
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
 ## 🚀 Features
