@@ -1,4 +1,4 @@
-# 🌐 netcalc — IPv4 Subnet Calculator
+# 🌐 netcalc — IPv4 Subnet Calculator by GG
 
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 

@@ -6,14 +6,12 @@ CUR_DIR=$(pwd)
 # Change to repository directory (ensure REP_DIR is set or use current)
 cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
-# Fetch all tags from origin to ensure we have the latest versions
-git fetch --tags origin
-
-# Determine the highest existing version tag (vMAJOR.MINOR.PATCH)
-LAST_TAG=$(git tag --list 'v*' | sort -V | tail -n1)
-if [[ -z "$LAST_TAG" ]]; then
-  LAST_TAG="v0.0.0"
+# Ensure .giti_tag exists with initial tag v0.0.0
+if [[ ! -f .giti_tag ]]; then
+  echo "v0.0.0" > .giti_tag
 fi
+# Read the last tag from .giti_tag
+LAST_TAG=$(tail -n1 .giti_tag)
 
 # Strip leading 'v' and split into components
 VER=${LAST_TAG#v}
@@ -65,3 +63,80 @@ git push origin master
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'echo "Error on line $LINENO. Exiting."; exit 1' ERR
+
+# Remember current directory
+CUR_DIR=$(pwd)
+
+# Change to repository directory
+cd "${REP_DIR:-$CUR_DIR}" || exit 1
+
+# Ensure on master branch
+git checkout master
+
+# Fetch latest tags
+git fetch --tags origin
+
+# Determine last tag, fallback to v0.0.1
+LAST_TAG=$(git tag --list 'v*' | sort -V | tail -n1 || echo "")
+if [[ -z "$LAST_TAG" ]]; then
+  LAST_TAG="v0.0.1"
+fi
+
+# Parse version parts
+VER=${LAST_TAG#v}
+IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
+
+# Bump patch with carry at 99
+PATCH=$((10#$PATCH + 1))
+if (( PATCH > 99 )); then
+  PATCH=1
+  MINOR=$((10#$MINOR + 1))
+  if (( MINOR > 99 )); then
+    MINOR=1
+    MAJOR=$((10#$MAJOR + 1))
+  fi
+fi
+
+# Format patch as two digits
+printf -v PATCH "%02d" "$PATCH"
+
+# Construct new tag
+NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+echo "New tag: $NEW_TAG"
+
+# Prompt for commit message
+echo
+git diff --quiet || git diff
+read -rp "Commit Message: " MSG
+COMMIT_MSG="[$NEW_TAG] ${MSG:-release}"
+
+# Create GitHub release
+gh release create "$NEW_TAG" --title "$COMMIT_MSG" --notes "$COMMIT_MSG"
+
+# Upload binaries as assets
+for path in bin/*; do
+  if [[ -d "$path" ]]; then
+    dir=$(basename "$path")
+    for file in "$path"/*; do
+      [[ -f "$file" ]] || continue
+      asset="${dir}-$(basename "$file")"
+      gh release upload "$NEW_TAG" "$file" --clobber --pattern "${file}"
+    done
+  fi
+done
+
+# Tag and push
+git tag "$NEW_TAG"
+git commit -am "$COMMIT_MSG"
+git push origin master --tags
+
+# Record tag history
+echo "$NEW_TAG" >> .giti_tag
+
+# Return to original directory
+cd "$CUR_DIR" || exit 1
+
+echo "Release $NEW_TAG created and pushed successfully."

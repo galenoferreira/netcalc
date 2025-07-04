@@ -1,26 +1,23 @@
 name: CI/CD Pipeline
+
 on:
-  push:
-    branches: [ main ]
-    tags: ['v*']
-  pull_request:
-    branches: [ main ]
-  release:
-    types: [ published ]
+  workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
 
 env:
-  # Git Configuration
-  GIT_USER: "github-actions[bot]"
-  GIT_EMAIL: "actions@github.com"
-
-  # Build Configuration
+  # Versões e Configurações
   GO_VERSION: '1.20'
-
-  # Authentication
+  UBUNTU_VERSION: 'ubuntu-latest'
+  
+  # Git
+  GIT_CONFIG:
+    USER: "github-actions[bot]"
+    EMAIL: "actions@github.com"
+  
+  # Autenticação
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 defaults:
@@ -31,52 +28,55 @@ jobs:
   build-and-test:
     name: Build and Test
     if: |
+      github.event_name == 'pull_request' ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main')
-      || github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.UBUNTU_VERSION }}
     concurrency:
       group: ${{ github.workflow }}-verify-${{ github.ref }}
       cancel-in-progress: true
     steps:
-      - name: PROD-Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: PROD-Setup Go Environment
+      - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: PROD-Build Application
+      - name: Build
         run: go build -v ./...
 
-      - name: PROD-Run Tests
+      - name: Test
         run: go test -v ./...
 
   update-changelog:
     name: Update Changelog
     if: github.event_name == 'release'
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.UBUNTU_VERSION }}
     steps:
-      - name: PROD-Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: PROD-Configure Git
+      - name: Configure Git
         run: |
-          git config user.name "${{ env.GIT_USER }}"
-          git config user.email "${{ env.GIT_EMAIL }}"
+          git config user.name "${{ env.GIT_CONFIG.USER }}"
+          git config user.email "${{ env.GIT_CONFIG.EMAIL }}"
           git checkout main
 
-      - name: PROD-Install GitHub CLI
+      - name: Install GitHub CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y gh
 
-      - name: PROD-Update Changelog
-        run: gh release view "${{ github.event.release.tag_name }}" --json body --jq .body > CHANGELOG.md
+      - name: Update Changelog
+        run: |
+          gh release view "${{ github.event.release.tag_name }}" \
+            --json body \
+            --jq .body > CHANGELOG.md
 
-      - name: PROD-Commit Changes
+      - name: Commit Changes
         run: |
           git add CHANGELOG.md
           if ! git diff --staged --quiet; then
@@ -87,18 +87,20 @@ jobs:
   deploy-production:
     name: Deploy to Production
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.UBUNTU_VERSION }}
     needs: build-and-test
+    env:
+      GITHUB_REPO: ${{ github.repository }}
+      REP_DIR: ${{ github.workspace }}
     steps:
-      - name: PROD-Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: PROD-Deploy to Production
+      - name: Deploy
         run: |
           chmod +x ./deploy.py
-          ./deploy.py --build --test \
+          ./deploy.py \
+            --build \
+            --test \
             --commit "ci: implantação em produção" \
             --tag "release-${{ github.run_number }}"
-        env:
-          GITHUB_REPO: ${{ github.repository }}
-          REP_DIR: ${{ github.workspace }}
