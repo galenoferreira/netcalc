@@ -13,7 +13,7 @@ if git diff --quiet .github/workflows/main.yml; then
 else
   git add .github/workflows/main.yml
   git commit -m "[skip ci] chore: update main workflow"
-  git push origin master
+  git push origin main
 fi
 
 ./build
@@ -81,15 +81,15 @@ for artifact in bin/*/*; do
   fi
 done
 
-# Ensure we are on the master branch
-git checkout master
+# Ensure we are on the main branch
+git checkout main
 
-# Create and push the new tag on master branch;
-git tag "$NEW_TAG" master
+# Create and push the new tag on main branch;
+git tag "$NEW_TAG" main
 git commit -m "$COMMIT_MSG"
 # git push origin --tags
 
-git push origin master
+git push origin main
 
 # Record the new tag in .giti_tag (append to preserve history)
 echo "$NEW_TAG" >> .giti_tag
