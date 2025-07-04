@@ -90,7 +90,12 @@ jobs:
       - name: Commit and push CHANGELOG.md
         run: |
           git add CHANGELOG.md
-          git pull --rebase --autostash origin main
+          # Stash changes, keep index
+          git stash push --keep-index -m "changelog-stash"
+          # Pull latest changes from main
+          git pull origin main
+          # Restore stash
+          git stash pop || true
           if ! git diff --staged --quiet; then
             git commit --author="Release Bot <noreply@github.com>" -m "docs(changelog): update for ${TAG}"
             git push origin main
