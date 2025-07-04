@@ -6,3 +6,11 @@
 
 **Commits since v1.1.48:**
 - [v1.1.48] VAMOS TENTANDO (galenogarbe-public)
+## v1.1.50 - 2025-07-04
+
+**Release Notes:**
+  **Full Changelog**: https://github.com/galenoferreira/netcalc/compare/v1.1.49...v1.1.50
+
+**Commits since v1.1.49:**
+- docs(changelog): update for (Release Bot)
+- [v1.1.49] ENSURE ON M AIN BRANCH (galenogarbe-public)
