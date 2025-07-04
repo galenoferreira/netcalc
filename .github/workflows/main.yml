@@ -74,6 +74,9 @@ jobs:
 
       - name: Commit Changes
         run: |
+          # Sync with remote main to avoid conflicts
+          git fetch origin main
+          git rebase origin/main
           git add CHANGELOG.md
           if ! git diff --staged --quiet; then
             git commit -m "docs: atualizar CHANGELOG para ${{ github.event.release.tag_name }}"
