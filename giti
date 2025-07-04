@@ -54,13 +54,13 @@ for artifact in bin/*/*; do
   fi
 done
 
-# Ensure we are on the master branch
-git checkout master
+# Ensure we are on the main branch
+git checkout main
 
-# Create and push the new tag on master branch
+# Create and push the new tag on main branch
 git tag "$NEW_TAG"
 git commit -m "$COMMIT_MSG"
-git push origin master
+git push origin main
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
