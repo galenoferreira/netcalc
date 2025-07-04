@@ -49,3 +49,15 @@
 
 **Commits since v1.1.53:**
 - docs(changelog): update for (Release Bot)
+## v1.1.55 - 2025-07-04
+
+**Release Notes:**
+  **Full Changelog**: https://github.com/galenoferreira/netcalc/compare/v1.1.54...v1.1.55
+
+**Commits since v1.1.54:**
+- Merge remote-tracking branch 'origin/main' (galenogarbe-public)
+- Add git stage command before returning to original directory in deploy.sh (galenogarbe-public)
+- docs(changelog): update for (Release Bot)
+- [v1.1.54] Final Test Automation (galenogarbe-public)
+- Merge remote-tracking branch 'origin/main' (galenogarbe-public)
+- [v1.1.53] STABLE with BINARIES Release (galenogarbe-public)
