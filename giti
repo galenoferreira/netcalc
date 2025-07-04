@@ -41,18 +41,12 @@ read -p "Commit Message: " MSG
 COMMIT_MSG="$PREFIX $MSG"
 
 # Stage all changes
+./build
 git add .
 
 # Create GitHub release
 gh release create "$NEW_TAG" \
   --title "$COMMIT_MSG"
-
-# Upload each binary file in the bin subdirectories
-for artifact in bin/*/*; do
-  if [ -f "$artifact" ]; then
-    gh release upload "$NEW_TAG" "$artifact" --clobber
-  fi
-done
 
 # Ensure we are on the main branch
 git checkout main
@@ -61,6 +55,13 @@ git checkout main
 git tag "$NEW_TAG"
 git commit -m "$COMMIT_MSG"
 git push origin main
+
+# Upload each binary file in the bin subdirectories
+for artifact in bin/*/*; do
+  if [ -f "$artifact" ]; then
+    gh release upload "$NEW_TAG" "$artifact" --clobber
+  fi
+done
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
