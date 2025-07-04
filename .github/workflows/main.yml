@@ -81,6 +81,7 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "docs: atualizar CHANGELOG para ${{ github.event.release.tag_name }}"
             git push origin main
+          fi
 
   deploy-production:
     name: Deploy to Production
