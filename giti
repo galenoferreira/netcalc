@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Remember current directory;
+# Remember current directory
 CUR_DIR=$(pwd)
+
 # Change to repository directory (ensure REP_DIR is set or use current)
 cd "${REP_DIR:-$CUR_DIR}" || exit 1
 
@@ -10,6 +11,7 @@ cd "${REP_DIR:-$CUR_DIR}" || exit 1
 if [[ ! -f .giti_tag ]]; then
   echo "v0.0.0" > .giti_tag
 fi
+
 # Read the last tag from .giti_tag
 LAST_TAG=$(tail -n1 .giti_tag)
 
@@ -27,7 +29,6 @@ echo "$NEW_TAG" >> .giti_tag
 # Prepare prefix for commit message
 PREFIX="[$NEW_TAG]"
 
-
 # Show diff
 echo
 git diff
@@ -42,101 +43,24 @@ COMMIT_MSG="$PREFIX $MSG"
 # Stage all changes
 git add .
 
-
-# Na raiz do repositório local;
+# Create GitHub release
 gh release create "$NEW_TAG" \
   --title "$COMMIT_MSG"
 
 # Upload each binary file in the bin subdirectories
 for artifact in bin/*/*; do
-  [ -f "$artifact" ] && gh release upload "$NEW_TAG" "$artifact" --clobber
+  if [ -f "$artifact" ]; then
+    gh release upload "$NEW_TAG" "$artifact" --clobber
+  fi
 done
 
 # Ensure we are on the master branch
 git checkout master
 
-# Create and push the new tag on master branch;
-git tag "$NEW_TAG" master
+# Create and push the new tag on master branch
+git tag "$NEW_TAG"
 git commit -m "$COMMIT_MSG"
-# git push origin --tags
 git push origin master
 
 # Return to original directory
 cd "$CUR_DIR" || exit 1
-#!/usr/bin/env bash
-set -euo pipefail
-trap 'echo "Error on line $LINENO. Exiting."; exit 1' ERR
-
-# Remember current directory
-CUR_DIR=$(pwd)
-
-# Change to repository directory
-cd "${REP_DIR:-$CUR_DIR}" || exit 1
-
-# Ensure on master branch
-git checkout master
-
-# Fetch latest tags
-git fetch --tags origin
-
-# Determine last tag, fallback to v0.0.1
-LAST_TAG=$(git tag --list 'v*' | sort -V | tail -n1 || echo "")
-if [[ -z "$LAST_TAG" ]]; then
-  LAST_TAG="v0.0.1"
-fi
-
-# Parse version parts
-VER=${LAST_TAG#v}
-IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
-
-# Bump patch with carry at 99
-PATCH=$((10#$PATCH + 1))
-if (( PATCH > 99 )); then
-  PATCH=1
-  MINOR=$((10#$MINOR + 1))
-  if (( MINOR > 99 )); then
-    MINOR=1
-    MAJOR=$((10#$MAJOR + 1))
-  fi
-fi
-
-# Format patch as two digits
-printf -v PATCH "%02d" "$PATCH"
-
-# Construct new tag
-NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
-echo "New tag: $NEW_TAG"
-
-# Prompt for commit message
-echo
-git diff --quiet || git diff
-read -rp "Commit Message: " MSG
-COMMIT_MSG="[$NEW_TAG] ${MSG:-release}"
-
-# Create GitHub release
-gh release create "$NEW_TAG" --title "$COMMIT_MSG" --notes "$COMMIT_MSG"
-
-# Upload binaries as assets
-for path in bin/*; do
-  if [[ -d "$path" ]]; then
-    dir=$(basename "$path")
-    for file in "$path"/*; do
-      [[ -f "$file" ]] || continue
-      asset="${dir}-$(basename "$file")"
-      gh release upload "$NEW_TAG" "$file" --clobber --pattern "${file}"
-    done
-  fi
-done
-
-# Tag and push
-git tag "$NEW_TAG"
-git commit -am "$COMMIT_MSG"
-git push origin master --tags
-
-# Record tag history
-echo "$NEW_TAG" >> .giti_tag
-
-# Return to original directory
-cd "$CUR_DIR" || exit 1
-
-echo "Release $NEW_TAG created and pushed successfully."

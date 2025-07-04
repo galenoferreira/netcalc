@@ -1,0 +1,14 @@
+.github/workflows/MAIN.md
+.github/workflows/cd_ci.yml
+.github/workflows/main.yml
+.github/workflows/main_template.yml
+.giti_tag
+.gitignore
+CHANGELOG.md
+README.md
+bin/linux/netcalc_linuxamd64
+bin/mac_apple_silicon/netcalcarm64
+bin/mac_intel/netcalc_macamd64
+build
+deploy.py
+giti
