@@ -11,7 +11,7 @@ permissions:
 env:
   # Versões e Configurações
   GO_VERSION: '1.20'
-  UBUNTU_VERSION: 'latest'
+  UBUNTU_VERSION: '24.04'
   
   # Git
   GIT_CONFIG:
