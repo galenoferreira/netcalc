@@ -1,56 +1,5 @@
-## TL;DR; Quick Test
 
-Run these commands to quickly test each part of the CI/CD pipeline:
-
-```bash
-gh auth login
-```
-
-```bash
-git checkout main
-```
-
-```bash
-git pull origin main
-```
-
-```bash
-git commit --allow-empty -m "ci: test build"
-```
-
-```bash
-git push origin main
-```
-
-```bash
-git checkout -b test/ci
-```
-
-```bash
-git push -u origin test/ci
-```
-
-```bash
-gh pr create --title "Test CI" --body "Testing build & test" --base main
-```
-
-```bash
-git tag v0.0.0-test -m "Test Release"
-```
-
-```bash
-git push origin v0.0.0-test
-```
-
-```bash
-gh release create v0.0.0-test --notes "Testing changelog"
-```
-
-```bash
-# The deploy job runs automatically on push to main after tests pass.
-```
-
-# MAIN CD-CI Workflow Documentation
+## CI/CD Pipeline Documentation
 
 This document explains how to configure and use the consolidated CI/CD pipeline defined in `.github/workflows/main.yml`.
 
@@ -60,76 +9,16 @@ This document explains how to configure and use the consolidated CI/CD pipeline 
 
 - **Name:** `MAIN CD-CI Workflow`
 - **Events:**
-    - **push** to the `main` branch
-    - **pull_request** targeting `main`
-    - **release.published** (any new GitHub Release)
-    - also on changes to `.github/workflows/*.yml`
+    - **release.published** (when a new GitHub Release is published)
 
 These triggers ensure:
 
-1. Every change to `main` is built and tested.
-2. Pull requests against `main` also run the build/tests.
-3. Changelog is auto-updated when a Release is published.
+1. Changelog is auto-updated when a Release is published.
+2. Deployment to production runs on release tags.
 
 ---
 
-## 2. Permissions & Defaults
-
-```yaml
-permissions:
-  contents: write
-  pull-requests: write
-
-defaults:
-  run:
-    shell: bash
-```
-
-- **contents: write** — required to commit updated files (e.g., `CHANGELOG.md`).
-- **pull-requests: write** — reserved for potential PR updates.
-- All `run` steps execute under the `bash` shell by default.
-
----
-
-## 3. Global Environment Variables
-
-Defined in the `env:` section of the workflow:
-
-```yaml
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  COMMIT_USER: "github-actions[bot]"
-  COMMIT_EMAIL: "actions@github.com"
-```
-
-- **GH_TOKEN:** built-in Actions token for API calls.
-- **COMMIT_USER / COMMIT_EMAIL:** identity used for automated commits.
-
----
-
-## 4. Job: Build & Test
-
-```yaml
-jobs:
-  build_and_test:
-    if: |
-      (push to main or pull_request)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v3  # cache Go modules
-      - uses: actions/setup-go@v4
-      - run: go build -v ./...
-      - run: go test -v ./...
-```
-
-- **When it runs:** on pushes to `main` or any pull request, not on `release`.
-- **Caching:** reuses Go module cache to speed up builds.
-- **Concurrency:** cancels in-progress runs for the same branch to save resources.
-
----
-
-## 5. Job: Update CHANGELOG
+## 2. Job: Update CHANGELOG
 
 ```yaml
 jobs:
@@ -166,7 +55,7 @@ jobs:
 
 ---
 
-## 6. Job: Deploy to Production
+## 3. Job: Deploy to Production
 
 ```yaml
 jobs:

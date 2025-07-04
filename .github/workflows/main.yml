@@ -92,6 +92,8 @@ jobs:
           git pull origin main
           # Restore stash
           git stash pop || true
+          # Ensure on main branch
+          git checkout main
           if ! git diff --staged --quiet; then
             git commit --author="Release Bot <noreply@github.com>" -m "docs(changelog): update for ${TAG}"
             git push origin main
