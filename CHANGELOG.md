@@ -24,3 +24,13 @@
 - Reorder release upload logic after main branch commit. (galenogarbe-public)
 - docs(changelog): update for (Release Bot)
 - [v1.1.50] STABLE Version (galenogarbe-public)
+## v1.1.52 - 2025-07-04
+
+**Release Notes:**
+  **Full Changelog**: https://github.com/galenoferreira/netcalc/compare/v1.1.51...v1.1.52
+
+**Commits since v1.1.51:**
+- Merge remote-tracking branch 'origin/main' (galenogarbe-public)
+- [v0.0.1] Add deploy.sh script for automated version tagging, commits, and GitHub releases (galenogarbe-public)
+- docs(changelog): update for (Release Bot)
+- [v1.1.51] STABLE (galenogarbe-public)
