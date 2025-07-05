@@ -4,6 +4,8 @@
 
 A single-binary CLI tool for comprehensive IPv4 subnet calculations.
 
+Primeiro uso prático em 5/Jul/2025 (discussão subneting Galeno e Gaby)
+
 ## 🚀 Features
 
 - **Subnet Calculations**: network, broadcast, usable host range, total hosts.
