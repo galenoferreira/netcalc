@@ -61,3 +61,10 @@
 - [v1.1.54] Final Test Automation (galenogarbe-public)
 - Merge remote-tracking branch 'origin/main' (galenogarbe-public)
 - [v1.1.53] STABLE with BINARIES Release (galenogarbe-public)
+## v1.2.2 - 2025-07-08
+
+**Release Notes:**
+  [v1.2.2] TEST TAG
+
+**Commits since v1.2.1:**
+- [v1.2.2] TEST TAG (galenogarbe-public)
